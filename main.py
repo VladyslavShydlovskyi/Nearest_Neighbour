@@ -33,6 +33,7 @@ def min_distance(clean_coords, startt):
     distance = 0
     temp = []
     temp_dots = []
+    clean = []
     for i in range(length - number_of_nodes):
         for j in range(length):
             cur_dot = clean_coords[j][0]
@@ -56,15 +57,20 @@ def min_distance(clean_coords, startt):
             temp.append([startt, init_start])
             distance += clean_coords[i][2]
 
-    print(temp)
+    for i in range(len(temp)):
+        if temp[i] not in clean:
+            clean.append(temp[i])
+
+
+    print(clean)
     print(distance)
 
 
 if __name__ == "__main__":
-    number_of_nodes = int(input("How many nodes does your graph have?"))
+    number_of_nodes = int(input("How many nodes does your graph have? "))
     coordinates = []
     coordinates_clean = []
     keyboard(coordinates)
     compute(coordinates, coordinates_clean)
-    start = int(input("Enter your start point(number from 0 to %d)" % (number_of_nodes - 1)))
+    start = int(input("Enter your start point(number from 0 to %d) " % (number_of_nodes - 1)))
     min_distance(coordinates_clean, start)
