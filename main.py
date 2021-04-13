@@ -3,23 +3,6 @@ import math
 import matplotlib.pyplot as plt
 
 
-def file_read(x):
-    def wrapper(arr):
-        if state == "f":
-            x(arr)
-
-    return wrapper
-
-
-def keyboard_read(x):
-    def wrapper(arr):
-        if state == "k":
-            x(arr)
-
-    return wrapper
-
-
-@keyboard_read
 def keyboard(arr):
     print("Alright! Enter your coordinates line by line.")
     for i in range(number_of_nodes):
@@ -29,32 +12,59 @@ def keyboard(arr):
     return arr
 
 
-def file_in(arr):
-    pass
-
-
 def compute(coords, coords_clean):
     for i in range(len(coords)):
         for j in range(i + 1, len(coords)):
             tup = (i, j, round(math.sqrt((int(coords[i][0]) - int(coords[j][0])) ** 2
                                          + (int(coords[i][1]) - int(coords[j][1])) ** 2), 2))
+
+            tup2 = (j, i, round(math.sqrt((int(coords[i][0]) - int(coords[j][0])) ** 2
+                                          + (int(coords[i][1]) - int(coords[j][1])) ** 2), 2))
             coords_clean.append(tup)
+            coords_clean.append(tup2)
     return coords_clean
 
 
+def min_distance(clean_coords, startt):
+    init_start = startt
+    minn = float('inf')
+    used_starts = []
+    length = len(clean_coords)
+    distance = 0
+    temp = []
+    temp_dots = []
+    for i in range(length - number_of_nodes):
+        for j in range(length):
+            cur_dot = clean_coords[j][0]
+            if cur_dot == startt and (clean_coords[j][1] not in used_starts) and (cur_dot not in used_starts):
+                cur_min = clean_coords[j][2]
+                if minn > cur_min:
+                    minn = cur_min
+                    temp_dots = [clean_coords[j][0], clean_coords[j][1]]
+
+        distance += minn if minn != float('inf') else 0
+        minn = float('inf')
+        temp.append(temp_dots)
+        used_starts.append(startt)
+        startt = temp[i][1]
+
+    temp.pop(len(temp) - 1)
+    for i in range(length):
+        x = clean_coords[i][0]
+        y = clean_coords[i][1]
+        if x == startt and y == init_start:
+            temp.append([startt, init_start])
+            distance += clean_coords[i][2]
+
+    print(temp)
+    print(distance)
+
+
 if __name__ == "__main__":
-    state = input("Do you like to enter coords with a keyboard or file?""\n"
-                  "Please enter \"f\" or \"k\"")
     number_of_nodes = int(input("How many nodes does your graph have?"))
-    cities = nx.Graph()
     coordinates = []
     coordinates_clean = []
     keyboard(coordinates)
-    file_in(coordinates)
     compute(coordinates, coordinates_clean)
-    cities.add_weighted_edges_from(coordinates_clean)
-    plt.subplot(121)
-    nx.draw(cities, pos=nx.circular_layout(cities))
-    plt.show()
-
-
+    start = int(input("Enter your start point(number from 0 to %d)" % (number_of_nodes - 1)))
+    min_distance(coordinates_clean, start)
